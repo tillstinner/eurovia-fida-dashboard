@@ -1,0 +1,67 @@
+# ===============================
+# Dependencies
+# ===============================
+node_modules/
+
+# ===============================
+# Build output
+# ===============================
+dist/
+build/
+
+# ===============================
+# Vite
+# ===============================
+.vite/
+
+# ===============================
+# Environment variables
+# ===============================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# ===============================
+# Logs
+# ===============================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ===============================
+# OS / Editor files
+# ===============================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ===============================
+# IDEs
+# ===============================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.idea/
+*.iml
+
+# ===============================
+# TypeScript
+# ===============================
+*.tsbuildinfo
+
+# ===============================
+# Coverage / Test output
+# ===============================
+coverage/
+
+# ===============================
+# Optional: lockfiles (UNCOMMENT if you want)
+# ===============================
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

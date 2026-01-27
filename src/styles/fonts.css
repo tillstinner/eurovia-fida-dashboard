@@ -1,0 +1,7 @@
+/* Optional: local font-face declarations go here.
+   Keep it empty or add Inter from local assets later. */
+
+:root {
+  /* If you want a global font var: */
+  --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
