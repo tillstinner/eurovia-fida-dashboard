@@ -404,9 +404,14 @@ export const translations = {
         fr: 'Aperçu'
       },
       history: {
-        de: 'Historie',
-        en: 'History',
-        fr: 'Historique'
+        de: 'Aktivitätsprotokoll',
+        en: 'Activity Log',
+        fr: 'Journal d\'activité'
+      },
+      fullLog: {
+        de: 'Vollständiges Protokoll ansehen',
+        en: 'View full activity log',
+        fr: 'Voir le journal complet'
       },
       runtime: {
         de: 'Laufzeit',
@@ -444,9 +449,14 @@ export const translations = {
         fr: 'Voulez-vous vraiment révoquer l\'accès pour {name}? Le service ne pourra plus accéder à vos données bancaires.'
       },
       noHistory: {
-        de: 'Keine Historie verfügbar',
-        en: 'No history available',
-        fr: 'Aucun historique disponible'
+        de: 'Noch keine Aktivitäten für diesen Partnerdienst vorhanden.',
+        en: 'No activities recorded for this partner service yet.',
+        fr: 'Aucune activité enregistrée pour ce service partenaire pour le moment.'
+      },
+      viewFullLog: {
+        de: 'Vollständiges Aktivitätsprotokoll ansehen',
+        en: 'View full activity log',
+        fr: 'Voir le journal d\'activité complet'
       }
     },
   
@@ -630,9 +640,9 @@ export const translations = {
   // Audit Log (PB-07/08)
   audit: {
     title: {
-      de: 'Zugriffshistorie',
-      en: 'Access History',
-      fr: 'Historique d\'accès'
+      de: 'Aktivitätsprotokoll',
+      en: 'Activity Log',
+      fr: 'Journal d\'activité'
     },
     timestamp: {
       de: 'Zeitpunkt',
@@ -640,9 +650,9 @@ export const translations = {
       fr: 'Horodatage'
     },
     action: {
-      de: 'Aktion',
-      en: 'Action',
-      fr: 'Action'
+      de: 'Aktivität',
+      en: 'Activity',
+      fr: 'Activité'
     },
     partner: {
       de: 'Partnerdienst',
@@ -650,9 +660,9 @@ export const translations = {
       fr: 'Service partenaire'
     },
     result: {
-      de: 'Ergebnis',
-      en: 'Result',
-      fr: 'Résultat'
+      de: 'Status',
+      en: 'Status',
+      fr: 'Statut'
     },
     details: {
       de: 'Details',
@@ -664,10 +674,121 @@ export const translations = {
       en: 'View',
       fr: 'Voir'
     },
-    summaryLine: {
-      de: '{action} für {partner} am {date}. Ergebnis: {result}.',
-      en: '{action} for {partner} on {date}. Result: {result}.',
-      fr: '{action} pour {partner} le {date}. Résultat: {result}.'
+    // Activity Labels (PB-08)
+    activities: {
+      dataAccess: {
+        de: 'Datenzugriff: {category} (Level {level})',
+        en: 'Data access: {category} (Level {level})',
+        fr: 'Accès aux données : {category} (Niveau {level})'
+      },
+      requestReceived: {
+        de: 'Zugriffsanfrage eingegangen',
+        en: 'Access request received',
+        fr: 'Demande d\'accès reçue'
+      },
+      approved: {
+        de: 'Zugriff genehmigt',
+        en: 'Access approved',
+        fr: 'Accès approuvé'
+      },
+      denied: {
+        de: 'Zugriff abgelehnt',
+        en: 'Access denied',
+        fr: 'Accès refusé'
+      },
+      revoked: {
+        de: 'Zugriff entzogen',
+        en: 'Access revoked',
+        fr: 'Accès révoqué'
+      },
+      paused: {
+        de: 'Zugriff pausiert',
+        en: 'Access paused',
+        fr: 'Accès mis en pause'
+      },
+      resumed: {
+        de: 'Zugriff reaktiviert',
+        en: 'Access resumed',
+        fr: 'Accès réactivé'
+      },
+      exported: {
+        de: 'Report exportiert',
+        en: 'Report exported',
+        fr: 'Rapport exporté'
+      }
+    },
+    // Status Values
+    status: {
+      success: {
+        de: 'Erfolgreich',
+        en: 'Successful',
+        fr: 'Réussi'
+      },
+      info: {
+        de: 'Info',
+        en: 'Info',
+        fr: 'Info'
+      },
+      pending: {
+        de: 'Ausstehend',
+        en: 'Pending',
+        fr: 'En attente'
+      },
+      blocked: {
+        de: 'Blockiert',
+        en: 'Blocked',
+        fr: 'Bloqué'
+      }
+    },
+    // Details Fields
+    detailFields: {
+      eventType: {
+        de: 'Ereignistyp',
+        en: 'Event Type',
+        fr: 'Type d\'événement'
+      },
+      category: {
+        de: 'Datenkategorie',
+        en: 'Data Category',
+        fr: 'Catégorie de données'
+      },
+      level: {
+        de: 'Sensitivitätslevel',
+        en: 'Sensitivity Level',
+        fr: 'Niveau de sensibilité'
+      },
+      purpose: {
+        de: 'Zweck',
+        en: 'Purpose',
+        fr: 'Objectif'
+      },
+      source: {
+        de: 'Quelle',
+        en: 'Source',
+        fr: 'Source'
+      },
+      reason: {
+        de: 'Grund',
+        en: 'Reason',
+        fr: 'Raison'
+      }
+    },
+    types: {
+      dataAccess: {
+        de: 'Datenzugriff',
+        en: 'Data Access',
+        fr: 'Accès aux données'
+      },
+      consent: {
+        de: 'Consent-Management',
+        en: 'Consent Management',
+        fr: 'Gestion du consentement'
+      },
+      export: {
+        de: 'Report-Export',
+        en: 'Report Export',
+        fr: 'Exportation de rapport'
+      }
     },
     plainText: {
       de: 'Klartext-Erklärung',
@@ -678,33 +799,6 @@ export const translations = {
       de: 'Technischer Eintrag',
       en: 'Technical Entry',
       fr: 'Entrée technique'
-    },
-    actions: {
-      access_granted: {
-        de: 'Zugriff erteilt',
-        en: 'Access granted',
-        fr: 'Accès accordé'
-      },
-      access_revoked: {
-        de: 'Zugriff entzogen',
-        en: 'Access revoked',
-        fr: 'Accès révoqué'
-      },
-      access_extended: {
-        de: 'Zugriff verlängert',
-        en: 'Access extended',
-        fr: 'Accès prolongé'
-      },
-      pdf_exported: {
-        de: 'PDF-Report exportiert',
-        en: 'PDF report exported',
-        fr: 'Rapport PDF exporté'
-      },
-      notification_sent: {
-        de: 'Benachrichtigung gesendet',
-        en: 'Notification sent',
-        fr: 'Notification envoyée'
-      }
     }
   },
   
@@ -742,7 +836,66 @@ export const translations = {
     }
   },
   
-  // Common
+  // Export (WD-EX)
+  export: {
+    title: {
+      de: 'Export / Report',
+      en: 'Export / Report',
+      fr: 'Export / Rapport'
+    },
+    description: {
+      de: 'Laden Sie einen vollständigen Bericht über Ihre aktiven Datenfreigaben, Zugriffshistorie und Einwilligungen herunter.',
+      en: 'Download a complete report on your active data sharing, access history, and consents.',
+      fr: 'Téléchargez un rapport complet sur vos partages de données actifs, votre historique d\'accès et vos consentements.'
+    },
+    contains: {
+      de: 'Der Report enthält:',
+      en: 'The report contains:',
+      fr: 'Le rapport contient :'
+    },
+    items: {
+      partners: {
+        de: 'Übersicht aller aktiven Partnerdienste',
+        en: 'Overview of all active partner services',
+        fr: 'Aperçu de tous les services partenaires actifs'
+      },
+      consents: {
+        de: 'Erteilte Einwilligungen mit Zeitstempeln',
+        en: 'Granted consents with timestamps',
+        fr: 'Consentements accordés avec horodatage'
+      },
+      categories: {
+        de: 'Freigegebene Datenkategorien',
+        en: 'Shared data categories',
+        fr: 'Catégories de données partagées'
+      },
+      history: {
+        de: 'Vollständige Zugriffshistorie',
+        en: 'Complete access history',
+        fr: 'Historique d\'accès complet'
+      },
+      validity: {
+        de: 'Gültigkeitsdauern und Ablaufdaten',
+        en: 'Validity periods and expiration dates',
+        fr: 'Périodes de validité et dates d\'expiration'
+      },
+      security: {
+        de: 'Sicherheitsrelevante Ereignisse',
+        en: 'Security-relevant events',
+        fr: 'Événements liés à la sécurité'
+      }
+    },
+    button: {
+      de: 'PDF-Report herunterladen',
+      en: 'Download PDF report',
+      fr: 'Télécharger le rapport PDF'
+    },
+    footer: {
+      de: 'Der Report wird als PDF-Datei erstellt und enthält alle Ihre Daten zum Zeitpunkt des Exports.',
+      en: 'The report is created as a PDF file and contains all your data at the time of export.',
+      fr: 'Le rapport est créé sous forme de fichier PDF et contient toutes vos données au moment de l\'exportation.'
+    }
+  },
   common: {
     cancel: {
       de: 'Abbrechen',

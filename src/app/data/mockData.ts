@@ -44,9 +44,22 @@ export interface AuditLogEntry {
   id: string;
   timestamp: string;
   partnerId: string;
-  action: 'access_granted' | 'access_revoked' | 'access_extended' | 'pdf_exported' | 'notification_sent';
-  categoryIds?: string[];
-  result: 'success' | 'error';
+  type: 'data_access' | 'consent_lifecycle' | 'export';
+  activityKey: string;
+  status: 'success' | 'info' | 'pending' | 'blocked';
+  categoryId?: string;
+  level?: SensitivityLevel;
+  purpose?: {
+    de: string;
+    en: string;
+    fr: string;
+  };
+  source?: string;
+  reason?: {
+    de: string;
+    en: string;
+    fr: string;
+  };
   technicalDetails?: string;
 }
 
@@ -333,46 +346,159 @@ export const partnerServices: PartnerService[] = [
 export const auditLog: AuditLogEntry[] = [
   {
     id: 'log-1',
-    timestamp: '2026-01-18T09:15:00',
+    timestamp: '2026-01-28T14:30:00',
     partnerId: 'partner-1',
-    action: 'access_granted',
-    categoryIds: ['cat-1', 'cat-2', 'cat-5'],
-    result: 'success',
-    technicalDetails: 'OAuth2 token issued. Scope: read_accounts, read_transactions, read_cards. Token ID: tok_abc123'
+    type: 'data_access',
+    activityKey: 'dataAccess',
+    categoryId: 'cat-2',
+    level: 3,
+    status: 'success',
+    purpose: { de: 'Budgetplanung', en: 'Budget Planning', fr: 'Planification budgétaire' },
+    source: 'API (automatisiert)',
+    technicalDetails: 'GET /v1/transactions?limit=100. OAuth2 Token: tok_abc123. Scope: read_transactions'
   },
   {
     id: 'log-2',
-    timestamp: '2026-01-17T14:30:00',
-    partnerId: 'partner-5',
-    action: 'access_granted',
-    categoryIds: ['cat-1', 'cat-2', 'cat-3', 'cat-5'],
-    result: 'success',
-    technicalDetails: 'OAuth2 token issued. Scope: read_accounts, read_transactions, read_securities, read_cards. Token ID: tok_def456'
+    timestamp: '2026-01-28T11:15:00',
+    partnerId: 'partner-7',
+    type: 'consent_lifecycle',
+    activityKey: 'requestReceived',
+    status: 'pending',
+    purpose: { de: 'Versicherungsvergleich', en: 'Insurance Comparison', fr: 'Comparaison d\'assurance' },
+    source: 'Partner-Anfrage',
+    technicalDetails: 'POST /consents/requests. Incoming request from ASPSP-ID: InsuranceHub_01'
   },
   {
     id: 'log-3',
-    timestamp: '2026-01-16T11:00:00',
+    timestamp: '2026-01-28T09:45:00',
     partnerId: 'partner-2',
-    action: 'access_extended',
-    categoryIds: ['cat-1', 'cat-3'],
-    result: 'success',
-    technicalDetails: 'Token validity extended by 90 days. New expiry: 2026-03-01. Token ID: tok_ghi789'
+    type: 'data_access',
+    activityKey: 'dataAccess',
+    categoryId: 'cat-3',
+    level: 2,
+    status: 'success',
+    purpose: { de: 'Portfolio-Analyse', en: 'Portfolio Analysis', fr: 'Analyse de portefeuille' },
+    source: 'API',
+    technicalDetails: 'GET /v1/securities. Response status: 200 OK. Records retrieved: 15'
   },
   {
     id: 'log-4',
-    timestamp: '2026-01-15T16:45:00',
-    partnerId: 'partner-1',
-    action: 'pdf_exported',
-    result: 'success',
-    technicalDetails: 'Report generated. File: consent_report_2026-01-15.pdf. Size: 245KB'
+    timestamp: '2026-01-27T16:20:00',
+    partnerId: 'partner-5',
+    type: 'data_access',
+    activityKey: 'dataAccess',
+    categoryId: 'cat-1',
+    level: 2,
+    status: 'blocked',
+    reason: { de: 'Zugriff pausiert', en: 'Access paused', fr: 'Accès mis en pause' },
+    purpose: { de: 'Finanzanalyse', en: 'Financial Analysis', fr: 'Analyse financière' },
+    source: 'Batch-Job',
+    technicalDetails: 'GET /v1/balances. HTTP 403 Forbidden. Reason: Consent status "PAUSED"'
   },
   {
     id: 'log-5',
-    timestamp: '2026-01-14T10:20:00',
+    timestamp: '2026-01-27T14:00:00',
+    partnerId: 'partner-5',
+    type: 'consent_lifecycle',
+    activityKey: 'paused',
+    status: 'info',
+    source: 'Dashboard (User)',
+    technicalDetails: 'PATCH /consents/cat-1. Action: PAUSE. Origin: Web-UI. User-Agent: Mozilla/5.0...'
+  },
+  {
+    id: 'log-6',
+    timestamp: '2026-01-27T10:30:00',
+    partnerId: 'partner-6',
+    type: 'data_access',
+    activityKey: 'dataAccess',
+    categoryId: 'cat-6',
+    level: 1,
+    status: 'success',
+    purpose: { de: 'Sparziele-Verwaltung', en: 'Savings Goal Management', fr: 'Gestion des objectifs d\'épargne' },
+    source: 'API (via SDK)',
+    technicalDetails: 'GET /v1/standing-orders. Response time: 45ms. Security: mTLS'
+  },
+  {
+    id: 'log-7',
+    timestamp: '2026-01-26T15:45:00',
     partnerId: 'partner-3',
-    action: 'notification_sent',
-    result: 'success',
-    technicalDetails: 'Email notification sent to user. Type: expiring_consent. Template: expiry_reminder_5days'
+    type: 'consent_lifecycle',
+    activityKey: 'approved',
+    status: 'success',
+    source: 'Dashboard (2FA bestätigt)',
+    technicalDetails: 'POST /consents/confirm. Challenge type: SMS-OTP. Status: VERIFIED'
+  },
+  {
+    id: 'log-8',
+    timestamp: '2026-01-26T11:20:00',
+    partnerId: 'partner-3',
+    type: 'data_access',
+    activityKey: 'dataAccess',
+    categoryId: 'cat-4',
+    level: 3,
+    status: 'success',
+    purpose: { de: 'Kreditprüfung', en: 'Credit Check', fr: 'Vérification de crédit' },
+    source: 'API',
+    technicalDetails: 'GET /v1/loans. Scope: read_loans. Encryption: AES-256'
+  },
+  {
+    id: 'log-9',
+    timestamp: '2026-01-26T09:00:00',
+    partnerId: 'partner-1',
+    type: 'export',
+    activityKey: 'exported',
+    status: 'success',
+    source: 'System-Export',
+    technicalDetails: 'GENERATE /reports/activity. Format: PDF. Checksum: sha256_f9a8...'
+  },
+  {
+    id: 'log-10',
+    timestamp: '2026-01-25T16:15:00',
+    partnerId: 'partner-8',
+    type: 'data_access',
+    activityKey: 'dataAccess',
+    categoryId: 'cat-5',
+    level: 2,
+    status: 'success',
+    purpose: { de: 'Cashback-Optimierung', en: 'Cashback Optimization', fr: 'Optimisation cashback' },
+    source: 'API (automatisiert)',
+    technicalDetails: 'GET /v1/card-spend. Records: 42. Page: 1 of 1'
+  },
+  {
+    id: 'log-11',
+    timestamp: '2026-01-25T13:40:00',
+    partnerId: 'partner-4',
+    type: 'data_access',
+    activityKey: 'dataAccess',
+    categoryId: 'cat-7',
+    level: 3,
+    status: 'success',
+    purpose: { de: 'Steuererklärung', en: 'Tax Declaration', fr: 'Déclaration fiscale' },
+    source: 'API',
+    technicalDetails: 'GET /v1/income. User-Agent: TaxAssist-Engine/2.4'
+  },
+  {
+    id: 'log-12',
+    timestamp: '2026-01-25T10:00:00',
+    partnerId: 'partner-6',
+    type: 'consent_lifecycle',
+    activityKey: 'resumed',
+    status: 'success',
+    source: 'Dashboard (User)',
+    technicalDetails: 'PATCH /consents/cat-1. Action: RESUME. Timestamp: 1737802800'
+  },
+  {
+    id: 'log-13',
+    timestamp: '2026-01-25T08:30:00',
+    partnerId: 'partner-2',
+    type: 'data_access',
+    activityKey: 'dataAccess',
+    categoryId: 'cat-1',
+    level: 2,
+    status: 'success',
+    purpose: { de: 'Portfolio-Analyse', en: 'Portfolio Analysis', fr: 'Analyse de portefeuille' },
+    source: 'API',
+    technicalDetails: 'GET /v1/balances. Scope: read_accounts'
   }
 ];
 

@@ -199,36 +199,12 @@ export const FidaSidebar: React.FC<FidaSidebarProps> = ({
             onClick={() => setCurrentView("consent-management")}
           />
 
-          {/* Activity Log with Submenu (WD-AL-01) */}
           <NavItem
             icon={<Activity size={20} />}
             label={t("nav.accessHistory")}
-            active={currentView === "access-history" || currentView === "security-export"}
-            onClick={() => {
-              if (currentView === "access-history") {
-                setCurrentView("dashboard"); // simple toggle behavior or just keep
-              } else {
-                setCurrentView("access-history");
-              }
-            }}
-            hasSubmenu
-            expanded={currentView === "access-history" || currentView === "security-export"}
+            active={currentView === "access-history"}
+            onClick={() => setCurrentView("access-history")}
           />
-
-          {(currentView === "access-history" || currentView === "security-export") && (
-            <div className="space-y-1 mt-1">
-              <SubNavItem
-                label={t("nav.accessHistorySub.log")}
-                active={currentView === "access-history"}
-                onClick={() => setCurrentView("access-history")}
-              />
-              <SubNavItem
-                label={t("nav.accessHistorySub.export")}
-                active={currentView === "security-export"}
-                onClick={() => setCurrentView("security-export")}
-              />
-            </div>
-          )}
 
           {/* Security with Submenu (IN-01) */}
           <NavItem

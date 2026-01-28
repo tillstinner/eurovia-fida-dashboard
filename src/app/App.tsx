@@ -34,15 +34,13 @@ const AppContent: React.FC = () => {
       case 'data-categories':
         return t('nav.dataCategories');
       case 'access-history':
-        return t('nav.accessHistorySub.log');
+        return t('nav.accessHistory');
       case 'security-rights':
         return t('nav.securitySub.privacyRights');
       case 'security-contact':
         return t('nav.securitySub.contact');
       case 'security-transfer':
         return t('nav.securitySub.dataTransfer');
-      case 'security-export':
-        return t('nav.accessHistorySub.export');
       case 'notifications':
         return t('dashboard.notifications');
       case 'settings':

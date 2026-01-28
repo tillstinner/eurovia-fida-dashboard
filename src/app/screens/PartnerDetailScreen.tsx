@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Info, AlertCircle, XCircle } from 'lucide-react';
 import { useFida } from '@/app/context/FidaContext';
-import { dataCategories, auditLog as mockAuditLog } from '@/app/data/mockData';
+import { dataCategories, partnerServices } from '@/app/data/mockData';
 import { StatusBadge, SensitivityBadge } from '@/app/components/FidaComponents';
 import { ConfirmModal, ExtendAccessModal } from '@/app/components/FidaModals';
 import { toast } from 'sonner';
 
 export const PartnerDetailScreen: React.FC = () => {
-  const { t, partnerServices, selectedPartnerId, setCurrentView, revokeAccess, extendAccess, auditLog, language, previousView } = useFida();
+  const { t, partnerServices: allPartners, selectedPartnerId, setCurrentView, revokeAccess, extendAccess, auditLog, language, previousView } = useFida();
   const [activeTab, setActiveTab] = useState<'overview' | 'categories' | 'history'>('overview');
   const [revokeModalOpen, setRevokeModalOpen] = useState(false);
   const [extendModalOpen, setExtendModalOpen] = useState(false);
+  const [selectedLog, setSelectedLog] = useState<string | null>(null);
 
-  const partner = partnerServices.find(p => p.id === selectedPartnerId);
+  const partner = allPartners.find(p => p.id === selectedPartnerId);
 
   if (!partner) {
     return (
@@ -24,11 +25,11 @@ export const PartnerDetailScreen: React.FC = () => {
 
   const partnerCategories = dataCategories.filter(c => partner.categories.includes(c.id));
   const partnerHistory = auditLog.filter(log => log.partnerId === partner.id);
+  const selectedEntry = selectedLog ? auditLog.find(log => log.id === selectedLog) : null;
   
   const maxSensitivityLevel = Math.max(...partnerCategories.map(c => c.sensitivityLevel)) as 1 | 2 | 3;
 
   const handleBack = () => {
-    // Use previousView to determine where to go back, defaulting to 'data-sharing'
     const targetView = previousView || 'data-sharing';
     setCurrentView(targetView);
   };
@@ -43,6 +44,52 @@ export const PartnerDetailScreen: React.FC = () => {
   const handleExtendConfirm = (days: number) => {
     extendAccess(partner.id, days);
     toast.success(t('toasts.accessExtended'));
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'success':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-green-100 text-green-800">
+            <CheckCircle2 size={12} />
+            {t('audit.status.success')}
+          </span>
+        );
+      case 'info':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+            <Info size={12} />
+            {t('audit.status.info')}
+          </span>
+        );
+      case 'pending':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-amber-100 text-amber-800">
+            <AlertCircle size={12} />
+            {t('audit.status.pending')}
+          </span>
+        );
+      case 'blocked':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium bg-red-100 text-red-800">
+            <XCircle size={12} />
+            {t('audit.status.blocked')}
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getActivityLabel = (entry: any) => {
+    if (entry.activityKey === 'dataAccess' && entry.categoryId) {
+      const category = dataCategories.find(c => c.id === entry.categoryId);
+      const catName = (category?.name as any)?.[language] || entry.categoryId;
+      return t('audit.activities.dataAccess')
+        .replace('{category}', catName)
+        .replace('{level}', String(entry.level || ''));
+    }
+    return t(`audit.activities.${entry.activityKey}`);
   };
 
   return (
@@ -73,7 +120,7 @@ export const PartnerDetailScreen: React.FC = () => {
               <StatusBadge status={partner.status} label={t(`status.${partner.status}`)} />
             </div>
 
-            {/* Enhanced Date Meta (matching Datenfreigabe style) */}
+            {/* Enhanced Date Meta */}
             <div className="flex items-center gap-6 mt-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-md bg-green-50 flex items-center justify-center">
@@ -197,7 +244,7 @@ export const PartnerDetailScreen: React.FC = () => {
             </div>
           )}
 
-          {/* Categories Tab (IN-03) */}
+          {/* Categories Tab */}
           {activeTab === 'categories' && (
             <div className="space-y-4">
               <div className="overflow-x-auto">
@@ -241,39 +288,185 @@ export const PartnerDetailScreen: React.FC = () => {
             </div>
           )}
 
-          {/* History Tab (SE-05) */}
+          {/* History Tab */}
           {activeTab === 'history' && (
-            <div className="space-y-3">
+            <div className="space-y-4">
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={() => setCurrentView('access-history')}
+                  className="text-sm font-medium text-[var(--fida-info)] hover:underline flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-[var(--fida-info)] rounded px-2"
+                >
+                  {t('partner.viewFullLog')}
+                </button>
+              </div>
+
               {partnerHistory.length === 0 ? (
-                <p className="text-sm text-[var(--fida-text-secondary)] py-4">
+                <p className="text-sm text-[var(--fida-text-secondary)] py-4 text-center border border-dashed border-[var(--fida-divider)] rounded-lg">
                   {t('partner.noHistory')}
                 </p>
               ) : (
-                partnerHistory.map(entry => (
-                  <div
-                    key={entry.id}
-                    className="p-4 bg-[var(--fida-surface-2)] rounded-md"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="text-sm font-medium text-[var(--fida-text-primary)]">
-                        {t(`audit.actions.${entry.action}`)}
-                      </div>
-                      <div className="text-xs text-[var(--fida-text-secondary)]">
-                        {new Date(entry.timestamp).toLocaleString(language === 'de' ? 'de-DE' : language === 'fr' ? 'fr-FR' : 'en-US')}
-                      </div>
-                    </div>
-                    {entry.technicalDetails && (
-                      <div className="text-xs text-[var(--fida-text-secondary)] mt-2 font-mono bg-white p-2 rounded border border-[var(--fida-divider)]">
-                        {entry.technicalDetails}
-                      </div>
-                    )}
+                <div className="bg-white rounded-lg border border-[var(--fida-divider)] overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-[var(--fida-surface-2)]">
+                          <th className="text-left py-3 px-6 text-sm font-semibold text-[var(--fida-text-primary)] w-[25%]">
+                            {t('audit.timestamp')}
+                          </th>
+                          <th className="text-left py-3 px-6 text-sm font-semibold text-[var(--fida-text-primary)] w-[45%]">
+                            {t('audit.action')}
+                          </th>
+                          <th className="text-left py-3 px-6 text-sm font-semibold text-[var(--fida-text-primary)] w-[20%]">
+                            {t('audit.result')}
+                          </th>
+                          <th className="text-left py-3 px-6 text-sm font-semibold text-[var(--fida-text-primary)] w-[10%]">
+                            {t('audit.details')}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {partnerHistory.map(entry => (
+                          <tr key={entry.id} className="border-b border-[var(--fida-divider)] last:border-0 hover:bg-[var(--fida-surface-2)]/50">
+                            <td className="py-4 px-6 text-sm text-[var(--fida-text-secondary)] whitespace-nowrap">
+                              {new Date(entry.timestamp).toLocaleString(language === 'de' ? 'de-DE' : language === 'fr' ? 'fr-FR' : 'en-US')}
+                            </td>
+                            <td className="py-4 px-6 text-sm text-[var(--fida-text-primary)]">
+                              {getActivityLabel(entry)}
+                            </td>
+                            <td className="py-4 px-6">
+                              {getStatusBadge(entry.status)}
+                            </td>
+                            <td className="py-4 px-6">
+                              <button
+                                onClick={() => setSelectedLog(entry.id)}
+                                className="text-sm text-[var(--fida-info)] font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--fida-info)] rounded px-2 py-1"
+                              >
+                                {t('audit.view')}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                ))
+                </div>
               )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Structured Detail Modal (reused from global log) */}
+      {selectedEntry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setSelectedLog(null)}
+          />
+          <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-[var(--fida-divider)] flex justify-between items-center bg-[var(--fida-surface-2)]">
+              <h3 className="text-lg font-semibold text-[var(--fida-text-primary)]">
+                {t('audit.details')}
+              </h3>
+              <button onClick={() => setSelectedLog(null)} className="text-[var(--fida-text-secondary)] hover:text-[var(--fida-text-primary)]">
+                <XCircle size={24} />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--fida-text-secondary)] uppercase tracking-wider mb-1">
+                    {t('audit.partner')}
+                  </label>
+                  <p className="text-sm font-medium text-[var(--fida-text-primary)]">
+                    {allPartners.find(p => p.id === selectedEntry.partnerId)?.name || selectedEntry.partnerId}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--fida-text-secondary)] uppercase tracking-wider mb-1">
+                    {t('audit.detailFields.eventType')}
+                  </label>
+                  <p className="text-sm font-medium text-[var(--fida-text-primary)]">
+                    {t(`audit.types.${selectedEntry.type}`)}
+                  </p>
+                </div>
+                {selectedEntry.categoryId && (
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--fida-text-secondary)] uppercase tracking-wider mb-1">
+                      {t('audit.detailFields.category')}
+                    </label>
+                    <p className="text-sm font-medium text-[var(--fida-text-primary)]">
+                      {(dataCategories.find(c => c.id === selectedEntry.categoryId)?.name as any)?.[language] || selectedEntry.categoryId}
+                    </p>
+                  </div>
+                )}
+                {selectedEntry.level && (
+                  <div>
+                    <label className="block text-xs font-semibold text-[var(--fida-text-secondary)] uppercase tracking-wider mb-1">
+                      {t('audit.detailFields.level')}
+                    </label>
+                    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-bold ${
+                      selectedEntry.level === 3 ? 'bg-red-100 text-red-700' :
+                      selectedEntry.level === 2 ? 'bg-orange-100 text-orange-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
+                      Level {selectedEntry.level}
+                    </span>
+                  </div>
+                )}
+                {selectedEntry.purpose && (
+                  <div className="col-span-2">
+                    <label className="block text-xs font-semibold text-[var(--fida-text-secondary)] uppercase tracking-wider mb-1">
+                      {t('audit.detailFields.purpose')}
+                    </label>
+                    <p className="text-sm text-[var(--fida-text-primary)]">
+                      {(selectedEntry.purpose as any)[language]}
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--fida-text-secondary)] uppercase tracking-wider mb-1">
+                    {t('audit.detailFields.source')}
+                  </label>
+                  <p className="text-sm text-[var(--fida-text-primary)]">
+                    {selectedEntry.source}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--fida-text-secondary)] uppercase tracking-wider mb-1">
+                    {t('audit.result')}
+                  </label>
+                  {getStatusBadge(selectedEntry.status)}
+                  {selectedEntry.status === 'blocked' && selectedEntry.reason && (
+                    <p className="text-xs text-red-600 mt-1 font-medium">
+                      {t('audit.detailFields.reason')}: {selectedEntry.reason[language as keyof typeof selectedEntry.reason]}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[var(--fida-text-secondary)] uppercase tracking-wider mb-2">
+                  {t('audit.technical')}
+                </label>
+                <pre className="text-xs text-[var(--fida-text-secondary)] p-4 bg-[var(--fida-surface-2)] rounded-md overflow-x-auto font-mono border border-[var(--fida-divider)]">
+                  {selectedEntry.technicalDetails}
+                </pre>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-[var(--fida-divider)] bg-[var(--fida-surface-2)]">
+              <button
+                onClick={() => setSelectedLog(null)}
+                className="w-full px-4 py-2.5 bg-[var(--fida-primary-sidebar)] text-white rounded-md hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--fida-info)]"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       <ConfirmModal
