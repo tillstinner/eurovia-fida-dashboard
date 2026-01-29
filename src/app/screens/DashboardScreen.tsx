@@ -15,6 +15,7 @@ import {
   SensitivityBadge,
 } from "@/app/components/FidaComponents";
 import { ExtendAccessModal } from "@/app/components/FidaModals";
+import { dataCategories } from "@/app/data/mockData";
 import { toast } from "sonner";
 
 export const DashboardScreen: React.FC = () => {
@@ -185,7 +186,7 @@ export const DashboardScreen: React.FC = () => {
           {/* LEFT COLUMN - Datenfreigaben */}
           <div>
             {/* Header aligned with right column + link */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Share2
                   size={20}
@@ -204,7 +205,7 @@ export const DashboardScreen: React.FC = () => {
             </div>
 
             {/* Content section - Summary lines with right-aligned values in a compact container (WD-MA-01) */}
-            <div className="space-y-3 max-w-[320px]">
+            <div className="pl-[32px] space-y-3 max-w-[320px]">
               {/* Active partner services count */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-[var(--fida-text-secondary)]">
@@ -445,6 +446,30 @@ export const DashboardScreen: React.FC = () => {
                 const partner = partnerServices.find(
                   (p) => p.id === entry.partnerId,
                 );
+
+                // Helper to get activity label (copied from AccessHistoryScreen logic)
+                const getActivityLabel = (entry: any) => {
+                  if (
+                    entry.activityKey === "dataAccess" &&
+                    entry.categoryId
+                  ) {
+                    const category = dataCategories.find(
+                      (c) => c.id === entry.categoryId,
+                    );
+                    const catName =
+                      (category?.name as any)?.[t("language")] ||
+                      entry.categoryId;
+                    return t("audit.activities.dataAccess")
+                      .replace("{category}", catName)
+                      .replace("{level}", String(entry.level || ""));
+                  }
+                  // Fallback to localized activity key, then a generic label if missing
+                  const label = t(`audit.activities.${entry.activityKey}`);
+                  return label.includes("audit.activities")
+                    ? t("audit.action")
+                    : label;
+                };
+
                 return (
                   <div
                     key={entry.id}
@@ -455,15 +480,14 @@ export const DashboardScreen: React.FC = () => {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-[var(--fida-text-primary)] mb-1">
-                          {t(`audit.actions.${entry.action}`)}
+                        <div className="text-sm font-medium text-[var(--fida-text-primary)] mb-0.5">
+                          {getActivityLabel(entry)}
                         </div>
                         <div className="text-xs text-[var(--fida-text-secondary)]">
                           {partner?.name || "System"}
                         </div>
                       </div>
                       <div className="text-xs text-[var(--fida-text-secondary)] flex items-center gap-1 flex-shrink-0">
-                        <Activity size={12} />
                         {new Date(
                           entry.timestamp,
                         ).toLocaleDateString(
