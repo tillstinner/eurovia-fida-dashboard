@@ -76,7 +76,7 @@ export const SecurityContactScreen: React.FC = () => {
               <span className="font-medium text-[var(--fida-text-primary)]">Name:</span> Dr. Maria Schneider
             </p>
             <p className="text-[var(--fida-text-secondary)]">
-              <span className="font-medium text-[var(--fida-text-primary)]">E-Mail:</span> datenschutz@eurovia.de
+              <span className="font-medium text-[var(--fida-text-primary)]">E-Mail:</span> datenschutz@mock-bank.de
             </p>
             <p className="text-[var(--fida-text-secondary)]">
               <span className="font-medium text-[var(--fida-text-primary)]">Telefon:</span> +49 (0) 123 456 789

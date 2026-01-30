@@ -24,10 +24,10 @@ export const ContactScreen: React.FC = () => {
             <p className="text-[var(--fida-text-secondary)]">
               <span className="font-medium text-[var(--fida-text-primary)]">E-Mail:</span>{' '}
               <a 
-                href="mailto:datenschutz@eurovia.de" 
+                href="mailto:datenschutz@mock-bank.de" 
                 className="text-[var(--fida-primary-sidebar)] hover:underline"
               >
-                datenschutz@eurovia.de
+                datenschutz@mock-bank.de
               </a>
             </p>
             <p className="text-[var(--fida-text-secondary)]">
@@ -45,19 +45,19 @@ export const ContactScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 2 - Eurovia ServiceDesk */}
+        {/* Card 2 - ServiceDesk */}
         <div className="bg-white rounded-lg border border-[var(--fida-divider)] p-6 shadow-sm">
           <h3 className="font-semibold text-[var(--fida-text-primary)] mb-4">
-            Eurovia ServiceDesk / IT Client Service
+            Mock-Bank ServiceDesk / IT Client Service
           </h3>
           <div className="space-y-2 text-sm">
             <p className="text-[var(--fida-text-secondary)]">
               <span className="font-medium text-[var(--fida-text-primary)]">E-Mail:</span>{' '}
               <a 
-                href="mailto:servicedesk@eurovia.de" 
+                href="mailto:servicedesk@mock-bank.de" 
                 className="text-[var(--fida-primary-sidebar)] hover:underline"
               >
-                servicedesk@eurovia.de
+                servicedesk@mock-bank.de
               </a>
             </p>
             <p className="text-[var(--fida-text-secondary)]">
